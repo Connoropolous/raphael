@@ -395,7 +395,7 @@
     } else {
         // Browser globals (glob is window)
         // Raphael adds itself to window
-        factory(glob, glob.eve);
+        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
     }
 }(this, function (window, eve) {
     /*\
@@ -547,6 +547,7 @@
         paper = {},
         push = "push",
         ISURL = R._ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
+        ISCROSSLINK = R._ISCROSSLINK = /\((#\w{40})\)/,
         colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+%?(?:\s*,\s*[\d\.]+%?)?)\s*\)|hsba?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsla?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\))\s*$/i,
         isnan = {"NaN": 1, "Infinity": 1, "-Infinity": 1},
         bezierrg = /^(?:cubic-)?bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
@@ -6234,6 +6235,12 @@
                     case "fill":
                         var isURL = Str(value).match(R._ISURL);
                         if (isURL) {
+                            var URLContent = Str(value).match(R._ISCROSSLINK);
+                            if (URLContent != null)
+                                var isPatternURL = document.getElementById(URLContent[1].slice(1));
+                                if (isPatternURL)
+                                    $(node, {fill: value });     
+                                    break
                             el = $("pattern");
                             var ig = $("image");
                             el.id = R.createUUID();
@@ -8113,5 +8120,8 @@
     // Even with AMD, Raphael should be defined globally
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
+    if(typeof exports == "object"){
+        module.exports = R;
+    }
     return R;
 }));

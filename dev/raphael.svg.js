@@ -479,6 +479,12 @@ window.Raphael && window.Raphael.svg && function(R) {
                     case "fill":
                         var isURL = Str(value).match(R._ISURL);
                         if (isURL) {
+                            var URLContent = Str(value).match(R._ISCROSSLINK);
++                           if (URLContent != null)
++                               var isPatternURL = document.getElementById(URLContent[1].slice(1));
++                               if (isPatternURL)
++                                   $(node, {fill: value });     
++                                   break
                             el = $("pattern");
                             var ig = $("image");
                             el.id = R.createUUID();
